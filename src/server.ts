@@ -84,7 +84,7 @@ app.post("/webhook", async (req: Request, res: Response): Promise<void> => {
                 usuarioId,
                 produtoId,
                 stripeSessionId: session.id,
-                status: "CANCELADO",
+                status: "SEM_ESTOQUE_CANCELADO",
               },
             });
           }
@@ -121,16 +121,26 @@ app.post(
     try {
       const { produtoId, usuarioId } = req.body;
 
-      if(!produtoId || !usuarioId){
-        res.status(400).json({ error: "produtoId e usuarioId são obrigatórios." })
+      if (!produtoId || !usuarioId) {
+        res
+          .status(400)
+          .json({ error: "produtoId e usuarioId são obrigatórios." });
         return;
       }
 
-      const produto = await prisma.produto.findUnique({ where: { id: produtoId } });
+      const produto = await prisma.produto.findUnique({
+        where: { id: produtoId },
+      });
 
-      if(!produto || produto.estoque <= 0){
+      if (!produto || produto.estoque <= 0) {
         console.warn("Estoque do produto zerou durante sua sessão!.");
-        res.status(400).json({ error: "Produto esgotado!", mensagem: "Lamentamos, mas este item não está mais disponível no estoque." });
+        res
+          .status(400)
+          .json({
+            error: "Produto esgotado!",
+            mensagem:
+              "Lamentamos, mas este item não está mais disponível no estoque.",
+          });
         return;
       }
       const session = await stripe.checkout.sessions.create({
