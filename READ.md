@@ -14,8 +14,8 @@ Uma API RESTful robusta desenvolvida em Node.js e TypeScript para processamento 
 - **Checkout Dinâmico e Seguro:** Criação de sessões de pagamento no Stripe onde o preço e o nome do produto são buscados diretamente no Banco de Dados pelo `produtoId` (evitando manipulação de valores no client-side).
 - **Proteção Contra Race Condition:** Uso de operações atômicas (`decrement`) no banco de dados e filtros relacionais para garantir a integridade do estoque quando múltiplos usuários compram simultaneamente.
 - **Validação de Estoque em 2 Camadas:**
-  1. *Camada 1 (Pre-checkout):* Impede a geração do link de pagamento se o produto estiver esgotado.
-  2. *Camada 2 (Webhook):* Validação atômica no momento da confirmação do pagamento caso o item tenha esgotado durante a digitação do cartão.
+  1. _Camada 1 (Pre-checkout):_ Impede a geração do link de pagamento se o produto estiver esgotado.
+  2. _Camada 2 (Webhook):_ Validação atômica no momento da confirmação do pagamento caso o item tenha esgotado durante a digitação do cartão.
 - **Webhooks Seguros:** Processamento de eventos `checkout.session.completed` utilizando validação de assinatura criptográfica com o middleware `express.raw`.
 - **Persistência de Dados:** Registro de pedidos associados ao ID nativo da sessão do Stripe (`stripeSessionId`) para rastreabilidade e idempotência.
 
@@ -34,13 +34,15 @@ Uma API RESTful robusta desenvolvida em Node.js e TypeScript para processamento 
 ## 📦 Como Rodar o Projeto Localmente
 
 ### Pré-requisitos
+
 - [Node.js](https://nodejs.org/) (versão 18 ou superior)
 - [Stripe CLI](https://stripe.com/docs/stripe-cli) instalada para testes de webhooks locais
 
 ### 1. Clonar o repositório e instalar dependências
-```bash
-git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
-cd SEU_REPOSITORIO
+
+````bash
+git clone [https://github.com/luandev08/Sistema-de-checkout-com-Node.js.git](https://github.com/luandev08/Sistema-de-checkout-com-Node.js.git)
+cd Sistema-de-checkout-com-Node.js
 npm install
 
 ## 🔄 Fluxo de Funcionamento e Arquitetura
@@ -74,7 +76,7 @@ sequenceDiagram
     Note over Cliente, Stripe: 2. Fase de Confirmação (Webhook)
     Cliente->>Stripe: Finaliza pagamento no formulário
     Stripe->>Backend: POST /webhook (Evento: checkout.session.completed)
-    
+
     Backend->>Backend: Valida assinatura com express.raw
 
     Backend->>Banco: UPDATE Produto SET estoque = estoque - 1 WHERE estoque > 0
@@ -88,3 +90,4 @@ sequenceDiagram
         Backend-->>Stripe: Retorna HTTP 200 OK
     end
     end
+````
